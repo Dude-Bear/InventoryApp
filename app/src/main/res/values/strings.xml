@@ -53,7 +53,9 @@
     <!-- Text hint for price field in the editor [CHAR LIMIT=30] -->
     <string name="hint_quantity">15</string>
 
-
+    <!--Log messages for the EditorActivity -->
+    <string name="editor_insert_inventory_failed">Error with saving the inventory</string>
+    <string name="editor_insert_inventory_successful">inventory saved</string>
 
 
 </resources>

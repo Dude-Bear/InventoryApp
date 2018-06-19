@@ -94,7 +94,7 @@
             <EditText
                 android:id="@+id/edit_phone"
                 android:hint="@string/hint_phone"
-                android:inputType="textCapWords"
+                android:inputType="number"
                 style="@style/EditorFieldStyle" />
         </LinearLayout>
     </LinearLayout>

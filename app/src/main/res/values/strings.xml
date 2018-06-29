@@ -6,7 +6,7 @@
     <string name="action_insert_dummy_data">Insert Dummy Data</string>
 
     <!-- Label for overflow menu option that deletes all inventory data in the app [CHAR LIMIT=20] -->
-    <string name="action_delete_all_entries">Delete All Pets</string>
+    <string name="action_delete_all_entries">Delete All Inventory</string>
 
     <!-- Title for the activity to add a new inventory [CHAR LIMIT=20] -->
     <string name="editor_activity_title_new_inventory">Add a Inventory</string>
@@ -21,10 +21,10 @@
     <string name="category_overview">Book info</string>
 
     <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
-    <string name="hint_product_name">Title: e.g.: The Buried Giant</string>
+    <string name="hint_product_name">Titel</string>
 
     <!-- Text hint for author field in the editor [CHAR LIMIT=30] -->
-    <string name="hint_author">Author: e.g.: Kazuo Ishiguro</string>
+    <string name="hint_author">Author</string>
 
     <!-- Label for gender information in the editor [CHAR LIMIT=30] -->
     <string name="category_phone">Supplier Phone Number</string>
@@ -39,7 +39,7 @@
     <string name="category_supplier">Supplier</string>
 
     <!-- Text hint for supplier field in the editor [CHAR LIMIT=30] -->
-    <string name="hint_supplier_name">London Faber</string>
+    <string name="hint_supplier_name">Amazon</string>
 
     <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
     <string name="hint_price">21</string>
@@ -56,6 +56,39 @@
     <!--Log messages for the EditorActivity -->
     <string name="editor_insert_inventory_failed">Error with saving the inventory</string>
     <string name="editor_insert_inventory_successful">inventory saved</string>
+
+    <!-- Title text for the empty view -->
+   <string name="empty_view_title_text">It\'s a bit lonely here…</string>
+    <!-- Subtitle text for the empty view  -->
+   <string name="empty_view_subtitle_text">Get started by adding some inventory</string>
+
+    <!--Title for the activity-->
+    <string name="edit_inventory">EDIT INVENTORY</string>
+    <string name="add_inventory">ADD AN INVENTORY</string>
+    <string name="inventory_update_successful">Inventory updated</string>
+    <string name="inventory_update_failed">Inventory update failed</string>
+
+
+    <!-- Dialog message when user is leaving editor but hasn't saved changes [CHAR LIMIT=NONE] -->
+    <string name="unsaved_changes">Discard your changes and quit editing?</string>
+    <!-- Dialog button text for the option to discard a user's changes [CHAR LIMIT=20] -->
+    <string name="discard">Discard</string>
+    <!-- Dialog button text for the option to keep editing the current inventory [CHAR LIMIT=20] -->
+    <string name="keep_editing">Keep Editing</string>
+
+    <!-- Toast message in editor when current inventory was successfully deleted [CHAR LIMIT=NONE] -->
+    <string name="editor_delete_inventory_successful">Inventory deleted</string>
+    <!-- Toast message in editor when current inventory has failed to be deleted [CHAR LIMIT=NONE] -->
+    <string name="editor_delete_inventory_failed">Error with deleting inventory</string>
+    <!-- Dialog message to ask the user to confirm deleting the current inventory [CHAR LIMIT=NONE] -->
+    <string name="delete_dialog_msg">Delete this inventory?</string>
+    <!-- Dialog button text for the option to confirm deleting the current inventory [CHAR LIMIT=20] -->
+    <string name="delete">Delete</string>
+    <!-- Dialog button text for the option to cancel deletion of the current inventory [CHAR LIMIT=20] -->
+    <string name="cancel">Cancel</string>
+
+    <!-- Label for the inventory if the author is unknown [CHAR LIMIT=20] -->
+    <string name="unknown_author">Unknown author</string>
 
 
 </resources>

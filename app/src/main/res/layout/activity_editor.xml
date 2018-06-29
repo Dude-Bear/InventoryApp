@@ -94,7 +94,7 @@
             <EditText
                 android:id="@+id/edit_phone"
                 android:hint="@string/hint_phone"
-                android:inputType="number"
+                android:inputType="phone"
                 style="@style/EditorFieldStyle" />
         </LinearLayout>
     </LinearLayout>
@@ -156,7 +156,7 @@
             <EditText
                 android:id="@+id/edit_quantity"
                 android:hint="@string/hint_quantity"
-                android:inputType="textCapWords"
+                android:inputType="number"
                 style="@style/EditorFieldStyle" />
         </LinearLayout>
     </LinearLayout>

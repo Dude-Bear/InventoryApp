@@ -135,7 +135,7 @@ public class InventoryProvider extends ContentProvider {
     }
 
     /**
-     * Insert a pet into the database with the given content values. Return the new content URI
+     * Insert a inventory into the database with the given content values. Return the new content URI
      * for that specific row in the database.
      */
     private Uri insertInventory(Uri uri, ContentValues values) {

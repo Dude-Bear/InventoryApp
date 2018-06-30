@@ -50,7 +50,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
             }
         });
 
-        // Find the ListView which will be populated with the pet data
+        // Find the ListView which will be populated with the inventory data
         ListView inventoryListView = (ListView) findViewById(R.id.list);
 
         // Find and set empty view on the ListView, so that it only shows when the list has 0 items.
@@ -109,7 +109,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
         // Insert a new row for Toto into the provider using the ContentResolver.
         // Use the {@link PetEntry#CONTENT_URI} to indicate that we want to insert
-        // into the pets database table.
+        // into the inventory database table.
         // Receive the new content URI that will allow us to access Toto's data in the future.
         Uri newUri = getContentResolver().insert(InventoryEntry.CONTENT_URI, values);
     }

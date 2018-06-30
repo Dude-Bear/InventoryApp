@@ -439,7 +439,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         if(mCurrentInventoryUri != null) {
             // Call the ContentResolver to delete the inventory at the given content URI.
             // Pass in null for the selection and selection args because the mCurrentInventoryUri
-            // content URI already identifies the pet that we want.
+            // content URI already identifies the inventory that we want.
             int rowsDeleted = getContentResolver().delete(mCurrentInventoryUri, null, null);
 
             // Show a toast message depending on whether or not the delete was suxxessful.

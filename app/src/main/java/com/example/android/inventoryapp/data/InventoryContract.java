@@ -63,11 +63,11 @@ public final class InventoryContract {
         public final static String _ID = BaseColumns._ID;
         public final static String COLUMN_NAME = "name";
         public final static String COLUMN_AUTHOR = "author";
+        public final static String COLUMN_IMAGE = "image";
         public final static String COLUMN_SUPPLIER = "supplier";
         public final static String COLUMN_PHONE = "phone";
         public final static String COLUMN_PRICE = "price";
         public final static String COLUMN_QUANTITY = "quantity";
-
 
     }
 }

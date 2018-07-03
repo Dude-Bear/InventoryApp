@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.inventoryapp.data.InventoryContract.InventoryEntry;
@@ -73,18 +74,33 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private EditText mEditPrice;
 
     /**
-     * EditText field to enter the Quantity
+     * TextView field to enter the Quantity
      */
-    private EditText mEditQuantity;
+    private TextView mEditQuantity;
 
-    private static final int PICK_IMAGE_REQUEST = 0;
+    /**
+     * Minus Button to reduce the quantity
+     */
+    private Button mMinusButton;
 
-    private Uri mUri = Uri.parse("");
+    /**
+     * Plus button to increase the Quantity
+     */
+    private Button mPlusButton;
+
+    /**
+     * Start value for the quantity
+     */
+    private int quantity = 0;
 
     /**
      * Uri of the image
      */
     private Uri mInventoryImageUri;
+
+    private Uri mUri = Uri.parse("");
+
+    private static final int PICK_IMAGE_REQUEST = 0;
 
     /**
      * ImageView for the inventory object
@@ -147,14 +163,31 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mEditSupplier = (EditText) findViewById(R.id.edit_supplier);
         mEditPhone = (EditText) findViewById(R.id.edit_phone);
         mEditPrice = (EditText) findViewById(R.id.edit_price);
-        mEditQuantity = (EditText) findViewById(R.id.edit_quantity);
+        mEditQuantity = (TextView) findViewById(R.id.edit_quantity);
         mAddImageButton = (Button) findViewById(R.id.add_image_button);
         mImageView = (ImageView) findViewById(R.id.image_view);
+        mMinusButton = (Button) findViewById(R.id.minus_button);
+        mPlusButton = (Button) findViewById(R.id.plus_button);
+
 
         mAddImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openImageSelector();
+            }
+        });
+
+        mPlusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addOneToQuantity(view);
+            }
+        });
+
+        mMinusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                subtractOneOfQuantity(view);
             }
         });
 
@@ -171,7 +204,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mImageView.setOnTouchListener(mTouchListener);
 
     }
-
 
     // Get user input from the editor and save  data into database
 
@@ -260,8 +292,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 Toast.makeText(this, R.string.inventory_update_successful, Toast.LENGTH_SHORT).show();
             }
         }
-
-
     }
 
     @Override
@@ -599,5 +629,26 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             }
         }
     }
-}
 
+    // Increase / decrease Button logic
+
+    // set the quantity on the {@mEditQuantity}
+    public void displayProductQuantity(int mTextQuantity) {
+        mEditQuantity.setText(String.valueOf(mTextQuantity));
+    }
+
+    //increase the quantity by one
+    public void addOneToQuantity(View v) {
+        quantity = quantity + 1;
+        displayProductQuantity(quantity);
+    }
+
+    //reduce the quantity by one
+    private void subtractOneOfQuantity(View view) {
+        if (quantity > 0) {
+            quantity = quantity - 1;
+            displayProductQuantity(quantity);
+        }
+    }
+
+}

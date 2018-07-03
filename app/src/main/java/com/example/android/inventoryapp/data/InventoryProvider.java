@@ -171,6 +171,12 @@ public class InventoryProvider extends ContentProvider {
             throw new IllegalArgumentException("Inventory requires a  valid quantity");
         }
 
+        // Check that the image is not null
+        String image = values.getAsString(InventoryContract.InventoryEntry.COLUMN_IMAGE);
+        if (image == null) {
+            throw new IllegalArgumentException("Inventory requires a image");
+        }
+
         // Get writable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
@@ -276,6 +282,15 @@ public class InventoryProvider extends ContentProvider {
             Integer quantity = values.getAsInteger(InventoryContract.InventoryEntry.COLUMN_QUANTITY);
             if (quantity != null && quantity < 0) {
                 throw new IllegalArgumentException("Inventory requires valid quantity");
+            }
+        }
+
+        // If the key is present,
+        // check that the image value is not null.
+        if (values.containsKey(InventoryContract.InventoryEntry.COLUMN_IMAGE)) {
+            String supplier = values.getAsString(InventoryContract.InventoryEntry.COLUMN_IMAGE);
+            if (supplier == null) {
+                throw new IllegalArgumentException("Inventory requires a image");
             }
         }
 

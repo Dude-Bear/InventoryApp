@@ -1,6 +1,7 @@
 package com.example.android.inventoryapp;
 
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
@@ -9,24 +10,36 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.android.inventoryapp.data.InventoryContract.InventoryEntry;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Allows user to create a new inventory or edit an existing one.
  */
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks <Cursor> {
+
+    public static final String LOG_TAG = EditorActivity.class.getSimpleName();
 
     //Identifier for the inventory data loader
     private static final int EXISTING_INVENTORY_LOADER = 0;
@@ -63,6 +76,25 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      * EditText field to enter the Quantity
      */
     private EditText mEditQuantity;
+
+    private static final int PICK_IMAGE_REQUEST = 0;
+
+    private Uri mUri = Uri.parse("");
+
+    /**
+     * Uri of the image
+     */
+    private Uri mInventoryImageUri;
+
+    /**
+     * ImageView for the inventory object
+     */
+    private ImageView mImageView;
+
+    /**
+     * Button to add an Image
+     */
+    private Button mAddImageButton;
 
     // Boolean flag that keeps track of wether the inventory has been edited (true) or not (false)
     private boolean mInventoryHasChanged = false;
@@ -109,13 +141,22 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             getLoaderManager().initLoader(EXISTING_INVENTORY_LOADER, null, this);
         }
 
-        // Find all relevant views that we will need to read user input from
+        // Find all relevant views
         mEditName = (EditText) findViewById(R.id.edit_product_name);
         mEditAuthor = (EditText) findViewById(R.id.edit_author);
         mEditSupplier = (EditText) findViewById(R.id.edit_supplier);
         mEditPhone = (EditText) findViewById(R.id.edit_phone);
         mEditPrice = (EditText) findViewById(R.id.edit_price);
         mEditQuantity = (EditText) findViewById(R.id.edit_quantity);
+        mAddImageButton = (Button) findViewById(R.id.add_image_button);
+        mImageView = (ImageView) findViewById(R.id.image_view);
+
+        mAddImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openImageSelector();
+            }
+        });
 
         //Setup OnTouchListeners on all the input fields, so we can determine if the user has touched ord
         // modified them. This will let us know if there are unsaved changes
@@ -126,6 +167,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mEditPhone.setOnTouchListener(mTouchListener);
         mEditQuantity.setOnTouchListener(mTouchListener);
         mEditPrice.setOnTouchListener(mTouchListener);
+        mAddImageButton.setOnTouchListener(mTouchListener);
+        mImageView.setOnTouchListener(mTouchListener);
 
     }
 
@@ -141,13 +184,21 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String phoneString = mEditPhone.getText().toString().trim();
         String quantityString = mEditQuantity.getText().toString().trim();
         String priceString = mEditPrice.getText().toString().trim();
+        String uriString;
 
-        //Check if thies is supposed to be a new inventory
+        if (mUri.toString().isEmpty()) {
+            uriString = "drawable://" + R.drawable.ic_empty_inventory;
+        } else {
+            uriString = mUri.toString();
+        }
+
+        //Check if this is supposed to be a new inventory
         // and check if all the fields in the editor are blank
         if (mCurrentInventoryUri == null &&
                 TextUtils.isEmpty(nameString) && TextUtils.isEmpty(authorString) &&
                 TextUtils.isEmpty(supplierString) && TextUtils.isEmpty(phoneString) &&
-                TextUtils.isEmpty(quantityString) && TextUtils.isEmpty(priceString)) {return;}
+                TextUtils.isEmpty(quantityString) && TextUtils.isEmpty(priceString) &&
+                TextUtils.isEmpty(uriString)) {return;}
 
         // Create a ContentValues object where column names are the keys,
         // and inventory attributes are the values.
@@ -155,6 +206,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(InventoryEntry.COLUMN_NAME, nameString);
         values.put(InventoryEntry.COLUMN_AUTHOR, authorString);
         values.put(InventoryEntry.COLUMN_SUPPLIER, supplierString);
+        values.put(InventoryEntry.COLUMN_IMAGE, uriString);
         // If the phone number is not provided by the user, don't try to parse the string into an
         // integer value. Use 0 by default.
         int phone = 0;
@@ -314,7 +366,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 InventoryEntry.COLUMN_SUPPLIER,
                 InventoryEntry.COLUMN_PHONE,
                 InventoryEntry.COLUMN_PRICE,
-                InventoryEntry.COLUMN_QUANTITY};
+                InventoryEntry.COLUMN_QUANTITY,
+                InventoryEntry.COLUMN_IMAGE};
 
         //This loader will execute the ContentProvider's query method on a background thread
         return new CursorLoader(this,       //Parent activity context
@@ -343,6 +396,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             int phoneColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PHONE);
             int quantityColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_QUANTITY);
             int priceColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_PRICE);
+            int imageColumnIndex = cursor.getColumnIndex(InventoryEntry.COLUMN_IMAGE);
 
             // Extract out the value from the cursor for the given column index
             String name = cursor.getString(nameColumnIndex);
@@ -351,6 +405,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             String phone = cursor.getString(phoneColumnIndex);
             String quantity = cursor.getString(quantityColumnIndex);
             String price = cursor.getString(priceColumnIndex);
+            mInventoryImageUri = Uri.parse(cursor.getString(imageColumnIndex));
 
             //Update the views on the screen with the values from the database
             mEditName.setText(name);
@@ -359,6 +414,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             mEditPhone.setText(phone);
             mEditPrice.setText(price);
             mEditQuantity.setText(quantity);
+            mImageView.setImageURI(mInventoryImageUri);
         }
     }
 
@@ -371,7 +427,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mEditPhone.setText("");
         mEditQuantity.setText("");
         mEditPrice.setText("");
-    }
+            }
 
     /*
      * Show a dialog that warns the user there are unsaved changes that will be lost
@@ -455,4 +511,93 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         //Close the activity
         finish();
     }
+
+
+    // Image Button logic
+    // Credit goes to Carlos Jimenez who wrote an example app.
+
+    public void openImageSelector() {
+        Intent intent;
+
+        if (Build.VERSION.SDK_INT < 19) {
+            intent = new Intent(Intent.ACTION_GET_CONTENT);
+        } else {
+            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+        }
+
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
+        // The ACTION_OPEN_DOCUMENT intent was sent with the request code READ_REQUEST_CODE.
+        // If the request code seen here doesn't match, it's the response to some other intent,
+        // and the below code shouldn't run at all.
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
+            // The document selected by the user won't be returned in the intent.
+            // Instead, a URI to that document will be contained in the return intent
+            // provided to this method as a parameter.  Pull that uri using "resultData.getData()"
+
+            if (resultData != null) {
+                mUri = resultData.getData();
+                Log.i(LOG_TAG, "Uri: " + mUri.toString());
+
+                mImageView.setImageBitmap(getBitmapFromUri(mUri));
+            }
+        }
+    }
+
+    public Bitmap getBitmapFromUri(Uri uri) {
+
+        if (uri == null || uri.toString().isEmpty())
+            return null;
+
+        // Get the dimensions of the View
+        int targetW = mImageView.getWidth();
+        int targetH = mImageView.getHeight();
+
+        InputStream input = null;
+        try {
+            input = this.getContentResolver().openInputStream(uri);
+
+            // Get the dimensions of the bitmap
+            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+            bmOptions.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(input, null, bmOptions);
+            input.close();
+
+            int photoW = bmOptions.outWidth;
+            int photoH = bmOptions.outHeight;
+
+            // Determine how much to scale down the image
+            int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
+
+            // Decode the image file into a Bitmap sized to fill the View
+            bmOptions.inJustDecodeBounds = false;
+            bmOptions.inSampleSize = scaleFactor;
+            bmOptions.inPurgeable = true;
+
+            input = this.getContentResolver().openInputStream(uri);
+            Bitmap bitmap = BitmapFactory.decodeStream(input, null, bmOptions);
+            input.close();
+            return bitmap;
+
+        } catch (FileNotFoundException fne) {
+            Log.e(LOG_TAG, "Failed to load image.", fne);
+            return null;
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Failed to load image.", e);
+            return null;
+        } finally {
+            try {
+                input.close();
+            } catch (IOException ioe) {
+
+            }
+        }
+    }
 }
+

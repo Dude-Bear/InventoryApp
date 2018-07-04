@@ -98,6 +98,34 @@
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Supplier call category -->
+    <LinearLayout
+        android:id="@+id/call_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="Order Supplies: " />
+
+        <!-- Input field -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical">
+
+            <!-- Order Button -->
+           <Button
+               android:id="@+id/order_button"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:text="Call Supplier"/>
+        </LinearLayout>
+    </LinearLayout>
+
     <!-- Price category -->
     <LinearLayout
         android:id="@+id/container_price"
@@ -179,6 +207,8 @@
                 android:text="+" />
 
         </LinearLayout>
+
+
     </LinearLayout>
 
 

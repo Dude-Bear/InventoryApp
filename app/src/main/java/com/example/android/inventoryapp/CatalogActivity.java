@@ -7,7 +7,6 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -19,11 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.android.inventoryapp.data.InventoryContract.InventoryEntry;
-
-import java.net.URI;
 
 /**
  * Displays list of inventory that were entered and stored in the app.
@@ -118,7 +114,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
 
     //Helper method to delete all inventories in the database
 
-    private void deleteAllPets () {
+    private void deleteAllInventory() {
         int rowsDeleted = getContentResolver().delete(InventoryEntry.CONTENT_URI, null, null);
         Log.v("CatalogActivity", rowsDeleted + "rows deleted from inventory database");
     }
@@ -141,7 +137,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
-                deleteAllPets();
+                deleteAllInventory();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -153,7 +149,9 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         String [] projection = {
                 InventoryEntry._ID,
                 InventoryEntry.COLUMN_NAME,
-                InventoryEntry.COLUMN_AUTHOR};
+                InventoryEntry.COLUMN_AUTHOR,
+                InventoryEntry.COLUMN_PRICE,
+                InventoryEntry.COLUMN_QUANTITY};
 
         //The loader will execute the ContentProviders's query method on a background thread
         return new CursorLoader(this,       //Parent activity context

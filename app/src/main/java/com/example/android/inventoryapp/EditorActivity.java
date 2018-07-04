@@ -74,6 +74,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private EditText mEditPrice;
 
     /**
+     * Button to call the phone number of the supplier
+     */
+    private Button mPhoneCallButton;
+
+    /**
      * TextView field to enter the Quantity
      */
     private TextView mEditQuantity;
@@ -168,6 +173,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mImageView = (ImageView) findViewById(R.id.image_view);
         mMinusButton = (Button) findViewById(R.id.minus_button);
         mPlusButton = (Button) findViewById(R.id.plus_button);
+        mPhoneCallButton = (Button) findViewById(R.id.phone_call_button);
 
 
         mAddImageButton.setOnClickListener(new View.OnClickListener() {
@@ -188,6 +194,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             @Override
             public void onClick(View view) {
                 subtractOneOfQuantity(view);
+            }
+        });
+
+        mPhoneCallButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                makePhoneCallIntent();
             }
         });
 
@@ -649,6 +662,15 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             quantity = quantity - 1;
             displayProductQuantity(quantity);
         }
+    }
+
+
+    //Logic to call the supplier phone number
+    private void makePhoneCallIntent (){
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + mEditPhone.getText().toString().trim()));
+        startActivity(intent);
+
     }
 
 }

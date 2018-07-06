@@ -219,7 +219,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     // Get user input from the editor and save  data into database
-    private void saveInventory() {
+    private boolean saveInventory() {
         //Read from input fields
         //Use trim to eliminate leading or trailing white space
         String nameString = mEditName.getText().toString().trim();
@@ -247,6 +247,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 priceString.isEmpty() ||
                 (mInventoryImageUri.toString().isEmpty() && uriString.isEmpty())) {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_LONG).show();
+            return false;
         } else {
             // Create a ContentValues object where column names are the keys,
             // and inventory attributes are the values.
@@ -291,6 +292,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 }
             }
         }
+        return true;
     }
 
     @Override
@@ -319,12 +321,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
             //Respond to a click on the "Save" menu option
-            //TODO: stop leving the app when not all information are entered
             case R.id.action_save:
-                //Save inventory to database
-                saveInventory();
-                // Exit activity
-                finish();
+                //Save inventory to database if all fields are filled
+                if (saveInventory()) {
+                    // Exit activity
+                    finish();
+                }
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:

@@ -58,9 +58,9 @@
     <string name="editor_insert_inventory_successful">inventory saved</string>
 
     <!-- Title text for the empty view -->
-   <string name="empty_view_title_text">It\'s a bit lonely here…</string>
+    <string name="empty_view_title_text">It\'s a bit lonely here…</string>
     <!-- Subtitle text for the empty view  -->
-   <string name="empty_view_subtitle_text">Get started by adding some inventory</string>
+    <string name="empty_view_subtitle_text">Get started by adding some inventory</string>
 
     <!--Title for the activity-->
     <string name="edit_inventory">EDIT INVENTORY</string>

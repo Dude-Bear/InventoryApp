@@ -17,7 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,7 +37,7 @@ import java.io.InputStream;
 /**
  * Allows user to create a new inventory or edit an existing one.
  */
-public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks <Cursor> {
+public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String LOG_TAG = EditorActivity.class.getSimpleName();
 
@@ -46,7 +45,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private static final int EXISTING_INVENTORY_LOADER = 0;
 
     //Content URI for the existing inventory (null if it's a new inventory)
-    private  Uri mCurrentInventoryUri;
+    private Uri mCurrentInventoryUri;
 
     /**
      * EditText field to enter the product name
@@ -101,7 +100,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     /**
      * Uri of the image
      */
-    private Uri mInventoryImageUri;
+    private Uri mInventoryImageUri = Uri.parse("");
 
     private Uri mUri = Uri.parse("");
 
@@ -122,7 +121,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     // OnTouchListener that listens for any user touches on a View, implying that they are modifying the viee,
     // and we change the mInventoryHasChanged boolean to true.
-    private View.OnTouchListener mTouchListener = new View.OnTouchListener(){
+    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
 
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -145,7 +144,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         // If the intent does not contain a inventory URI, then we know that we are
         // creating a new inventory
-        if (mCurrentInventoryUri == null){
+        if (mCurrentInventoryUri == null) {
             //This is a new inventory, so change the app baar to say "Add inventory"
             setTitle(getString(R.string.add_inventory));
 
@@ -215,11 +214,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mEditPrice.setOnTouchListener(mTouchListener);
         mAddImageButton.setOnTouchListener(mTouchListener);
         mImageView.setOnTouchListener(mTouchListener);
-
+        mMinusButton.setOnTouchListener(mTouchListener);
+        mPlusButton.setOnTouchListener(mTouchListener);
     }
 
     // Get user input from the editor and save  data into database
-
     private void saveInventory() {
         //Read from input fields
         //Use trim to eliminate leading or trailing white space
@@ -231,78 +230,65 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String priceString = mEditPrice.getText().toString().trim();
         String uriString;
 
-        if (mUri.toString().isEmpty()) {
-            uriString = "drawable://" + R.drawable.ic_empty_inventory;
+        //Control if there is string for mUri (the data isn't saved in a text field, so this
+        // extra logic is necessary) otherwise use the "old" uri from the mInventoryUri"
+        if (mUri.toString().trim().isEmpty()) {
+            uriString = mInventoryImageUri.toString().trim();
         } else {
-            uriString = mUri.toString();
+            uriString = mUri.toString().trim();
         }
 
-        //Check if this is supposed to be a new inventory
-        // and check if all the fields in the editor are blank
-        if (mCurrentInventoryUri == null &&
-                TextUtils.isEmpty(nameString) && TextUtils.isEmpty(authorString) &&
-                TextUtils.isEmpty(supplierString) && TextUtils.isEmpty(phoneString) &&
-                TextUtils.isEmpty(quantityString) && TextUtils.isEmpty(priceString) &&
-                TextUtils.isEmpty(uriString)) {return;}
-
-        // Create a ContentValues object where column names are the keys,
-        // and inventory attributes are the values.
-        ContentValues values = new ContentValues();
-        values.put(InventoryEntry.COLUMN_NAME, nameString);
-        values.put(InventoryEntry.COLUMN_AUTHOR, authorString);
-        values.put(InventoryEntry.COLUMN_SUPPLIER, supplierString);
-        values.put(InventoryEntry.COLUMN_IMAGE, uriString);
-        // If the phone number is not provided by the user, don't try to parse the string into an
-        // integer value. Use 0 by default.
-        int phone = 0;
-        if (!TextUtils.isEmpty(phoneString)) {
-            phone = Integer.parseInt(phoneString);
-        }
-        values.put(InventoryEntry.COLUMN_PHONE, phone);
-        // If the price is not provided by the user, don't try to parse the string into an
-        // integer value. Use 0 by default.
-        int price = 0;
-        if (!TextUtils.isEmpty(priceString)) {
-            price = Integer.parseInt(priceString);
-        }
-        values.put(InventoryEntry.COLUMN_PRICE, price);
-        // If the quantity is not provided by the user, don't try to parse the string into an
-        // integer value. Use 0 by default.
-        int quantity = 0;
-        if (!TextUtils.isEmpty(quantityString)) {
-            quantity = Integer.parseInt(quantityString);
-        }
-        values.put(InventoryEntry.COLUMN_QUANTITY, quantity);
-
-        //Determine if this is a new or existing inventory by checking if mCurrentInventoryUri is null or not
-        if (mCurrentInventoryUri == null){
-            //This is a new inventory, so insert a new inventory in the provider
-            // returning the content URI for the new inventory.
-            Uri newUri = getContentResolver().insert(InventoryEntry.CONTENT_URI, values);
-
-            //Show a toast message depending on whether or not the isertion was successful.
-            if (newUri == null) {
-                //If the new content URI is null, then there was an error with insertion.
-                Toast.makeText(this, (R.string.editor_insert_inventory_failed), Toast.LENGTH_SHORT).show();
-            } else {
-                //Otherwise, the insertion was successful and we can display a toast.
-                Toast.makeText(this, (R.string.editor_insert_inventory_successful), Toast.LENGTH_SHORT).show();
-            }
-
+        //Check if all fields have been filled, if not make a toast message
+        if (nameString.isEmpty() ||
+                authorString.isEmpty() ||
+                supplierString.isEmpty() ||
+                phoneString.isEmpty() ||
+                quantityString.isEmpty() ||
+                priceString.isEmpty() ||
+                (mInventoryImageUri.toString().isEmpty() && uriString.isEmpty())) {
+            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_LONG).show();
         } else {
-            //Otherwise this is an existing inventory, so update the inventory with content URI: mCurrentInventoryUri
-            // and pass in the new ContentValues. Pass in null for the selection and selection args
-            // because mCurrentInventoryUri will already identify the correct row in the database that
-            // we want to modify
-            int rowsAffected = getContentResolver().update(mCurrentInventoryUri, values, null, null);
+            // Create a ContentValues object where column names are the keys,
+            // and inventory attributes are the values.
+            ContentValues values = new ContentValues();
+            values.put(InventoryEntry.COLUMN_NAME, nameString);
+            values.put(InventoryEntry.COLUMN_AUTHOR, authorString);
+            values.put(InventoryEntry.COLUMN_SUPPLIER, supplierString);
+            values.put(InventoryEntry.COLUMN_IMAGE, uriString);
+            values.put(InventoryEntry.COLUMN_PHONE, phoneString);
+            values.put(InventoryEntry.COLUMN_PRICE, priceString);
+            values.put(InventoryEntry.COLUMN_QUANTITY, quantityString);
 
-            //Show a toast message dependeing on whether or not the update was successful.
-            if (rowsAffected == 0) {
-                //If there are no rows affected, then there was an error with the update.
-                Toast.makeText(this, R.string.inventory_update_failed, Toast.LENGTH_SHORT).show();
+            //Determine if this is a new or existing inventory by checking if mCurrentInventoryUri is null or not
+            if (mCurrentInventoryUri == null) {
+                //This is a new inventory, so insert a new inventory in the provider
+                // returning the content URI for the new inventory.
+                Uri newUri = getContentResolver().insert(InventoryEntry.CONTENT_URI, values);
+
+                //Show a toast message depending on whether or not the isertion was successful.
+                if (newUri == null) {
+                    //If the new content URI is null, then there was an error with insertion.
+                    Toast.makeText(this, (R.string.editor_insert_inventory_failed), Toast.LENGTH_SHORT).show();
+                } else {
+                    //Otherwise, the insertion was successful and we can display a toast.
+                    Toast.makeText(this, (R.string.editor_insert_inventory_successful), Toast.LENGTH_SHORT).show();
+                }
+
             } else {
-                // Otherwise, the update was successful and we can display a toast.
-                Toast.makeText(this, R.string.inventory_update_successful, Toast.LENGTH_SHORT).show();
+                //Otherwise this is an existing inventory, so update the inventory with content URI: mCurrentInventoryUri
+                // and pass in the new ContentValues. Pass in null for the selection and selection args
+                // because mCurrentInventoryUri will already identify the correct row in the database that
+                // we want to modify
+                int rowsAffected = getContentResolver().update(mCurrentInventoryUri, values, null, null);
+
+                //Show a toast message dependeing on whether or not the update was successful.
+                if (rowsAffected == 0) {
+                    //If there are no rows affected, then there was an error with the update.
+                    Toast.makeText(this, R.string.inventory_update_failed, Toast.LENGTH_SHORT).show();
+                } else {
+                    // Otherwise, the update was successful and we can display a toast.
+                    Toast.makeText(this, R.string.inventory_update_successful, Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
@@ -318,10 +304,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     //This method is called after invalidateOptionsMenu(), so that the
     //menu can be updated (some menu items can be hidden or made visible).
     @Override
-    public boolean onPrepareOptionsMenu (Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         // If this is a new inventory, hide the "Delete" menu item.
-        if (mCurrentInventoryUri == null){
+        if (mCurrentInventoryUri == null) {
             MenuItem menuItem = menu.findItem(R.id.action_delete);
             menuItem.setVisible(false);
         }
@@ -332,7 +318,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
         switch (item.getItemId()) {
-            // Respond to a click on the "Save" menu option
+            //Respond to a click on the "Save" menu option
+            //TODO: stop leving the app when not all information are entered
             case R.id.action_save:
                 //Save inventory to database
                 saveInventory();
@@ -348,7 +335,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             case android.R.id.home:
                 //If the inventory hasn't changed, continue with novigating up to parent activity
                 //wich is the {@link CatalogActivity}.
-                if(!mInventoryHasChanged){
+                if (!mInventoryHasChanged) {
                     NavUtils.navigateUpFromSameTask(EditorActivity.this);
                     return true;
                 }
@@ -373,9 +360,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      * This method is called when the back button is pressed.
      */
     @Override
-    public  void onBackPressed(){
+    public void onBackPressed() {
         //If the inventory hasn't changed, continue with handling back button press
-        if(!mInventoryHasChanged) {
+        if (!mInventoryHasChanged) {
             super.onBackPressed();
             return;
         }
@@ -424,7 +411,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         // Bail early if the cursor is null or there is less than 1 row in the cursor
-        if (cursor == null || cursor.getCount() < 1){
+        if (cursor == null || cursor.getCount() < 1) {
             return;
         }
 
@@ -470,7 +457,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mEditPhone.setText("");
         mEditQuantity.setText("");
         mEditPrice.setText("");
-            }
+        Log.e("EditorActivity", "i was here: onLoaderReset");
+    }
 
     /*
      * Show a dialog that warns the user there are unsaved changes that will be lost
@@ -491,7 +479,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             public void onClick(DialogInterface dialog, int i) {
                 // User clicked the "Keep building" button, so dismiss the dialog
                 // and continue editing the inventory
-                if (dialog != null){
+                if (dialog != null) {
                     dialog.dismiss();
                 }
             }
@@ -501,7 +489,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
-
 
     // Prompt the user to confirm that they want to delete this inventory.
     private void showDeleteConfirmationDialog() {
@@ -535,22 +522,21 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      */
     private void deleteInventory() {
         // Only preform the delete if this is an existing inventory
-        if(mCurrentInventoryUri != null) {
+        if (mCurrentInventoryUri != null) {
             // Call the ContentResolver to delete the inventory at the given content URI.
             // Pass in null for the selection and selection args because the mCurrentInventoryUri
             // content URI already identifies the inventory that we want.
             int rowsDeleted = getContentResolver().delete(mCurrentInventoryUri, null, null);
 
             // Show a toast message depending on whether or not the delete was suxxessful.
-            if (rowsDeleted == 0){
+            if (rowsDeleted == 0) {
                 //If no rows were deleted, then there was an error with the delete.
-                Toast.makeText(this,getString(R.string.editor_delete_inventory_failed), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.editor_delete_inventory_failed), Toast.LENGTH_SHORT).show();
             } else {
                 //Otherwise, the delete was successful and we con display a toast.
                 Toast.makeText(this, getString(R.string.editor_delete_inventory_successful), Toast.LENGTH_SHORT).show();
             }
         }
-
         //Close the activity
         finish();
     }
@@ -558,7 +544,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     // Image Button logic
     // Credit goes to Carlos Jimenez who wrote an example app.
-
     public void openImageSelector() {
         Intent intent;
 
@@ -586,7 +571,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
             if (resultData != null) {
                 mUri = resultData.getData();
-                Log.i(LOG_TAG, "Uri: " + mUri.toString());
+                Log.e(LOG_TAG, "Uri (onActivityResult: " + mUri.toString());
 
                 mImageView.setImageBitmap(getBitmapFromUri(mUri));
             }
@@ -594,7 +579,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     public Bitmap getBitmapFromUri(Uri uri) {
-
         if (uri == null || uri.toString().isEmpty())
             return null;
 
@@ -650,27 +634,37 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mEditQuantity.setText(String.valueOf(mTextQuantity));
     }
 
-    //increase the quantity by one
+    //increase the (previous) quantity by one
     public void addOneToQuantity(View v) {
-        quantity = quantity + 1;
-        displayProductQuantity(quantity);
-    }
-
-    //reduce the quantity by one
-    private void subtractOneOfQuantity(View view) {
-        if (quantity > 0) {
-            quantity = quantity - 1;
+        String previousQuantityString = mEditQuantity.getText().toString();
+        int previousQuantityInt = Integer.parseInt(previousQuantityString);
+        if (previousQuantityString.isEmpty()) {
+            quantity = 0;
+        } else {
+            quantity = previousQuantityInt + 1;
             displayProductQuantity(quantity);
         }
     }
 
+    //reduce the (previous) quantity by one
+    private void subtractOneOfQuantity(View view) {
+        String previousQuantityString = mEditQuantity.getText().toString();
+        int previousQuantityInt = Integer.parseInt(previousQuantityString);
+        if (previousQuantityString.isEmpty()) {
+            return;
+        } else if (previousQuantityInt == 0) {
+            return;
+        } else {
+            quantity = previousQuantityInt - 1;
+            displayProductQuantity(quantity);
+        }
+    }
 
     //Logic to call the supplier phone number
-    private void makePhoneCallIntent (){
+    private void makePhoneCallIntent() {
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse("tel:" + mEditPhone.getText().toString().trim()));
         startActivity(intent);
 
     }
-
 }

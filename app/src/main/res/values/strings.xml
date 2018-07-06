@@ -90,5 +90,10 @@
     <!-- Label for the inventory if the author is unknown [CHAR LIMIT=20] -->
     <string name="unknown_author">Unknown author</string>
 
+    <!--Error message when fields left blank-->
+    <string name="toast_no_supplier_phone_number">please enter a phone supplier number</string>
+    <string name="toast_no_price">please enter a price</string>
+    <string name="toast_no_quantity">please enter a quantity</string>
+
 
 </resources>

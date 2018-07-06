@@ -1,6 +1,7 @@
 package com.example.android.inventoryapp;
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
@@ -131,6 +132,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     };
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

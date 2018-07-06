@@ -15,7 +15,9 @@
             android:id="@+id/name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
+            android:lines="1"
             android:textAppearance="?android:textAppearanceMedium"
             android:textColor="#2B3D4D" />
 
@@ -23,7 +25,9 @@
             android:id="@+id/author"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:fontFamily="sans-serif"
+            android:lines="1"
             android:textAppearance="?android:textAppearanceSmall"
             android:textColor="#AEB6BD" />
     </LinearLayout>
@@ -32,23 +36,35 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="3"
-        android:layout_marginLeft="12dp"
-        android:layout_marginRight="12dp"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:text="Price in Dollar: "
+            android:text="@string/list_item_price_label"
             android:textAppearance="?android:textAppearanceSmall" />
 
-        <TextView
-            android:id="@+id/list_item_price"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:textAppearanceMedium"
-            android:textColor="#2B3D4D" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/list_item_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="10"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textColor="#2B3D4D" />
+
+            <!-- Units for price ($) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/unit_price" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -63,14 +79,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:text="Quantity: "
+            android:text="@string/list_item_quantity_label"
             android:textAppearance="?android:textAppearanceSmall" />
 
         <TextView
             android:id="@+id/quantity"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:fontFamily="sans-serif"
+            android:lines="1"
             android:textAppearance="?android:textAppearanceMedium"
             android:textColor="#2B3D4D" />
 
@@ -82,5 +100,5 @@
         android:layout_height="wrap_content"
         android:layout_weight="2"
         android:focusable="false"
-        android:text="Sale" />
+        android:text="@string/list_item_sale_button" />
 </LinearLayout>

@@ -95,5 +95,10 @@
     <string name="toast_no_price">please enter a price</string>
     <string name="toast_no_quantity">please enter a quantity</string>
 
+    <!--Text for the list item views-->
+    <string name="list_item_quantity_label">Quantity:</string>
+    <string name="list_item_sale_button">Sale</string>
+    <string name="list_item_price_label">Price:</string>
+
 
 </resources>
